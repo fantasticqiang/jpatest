@@ -1,0 +1,11 @@
+spring:
+  datasource:
+    username: root
+    password: root
+    url: jdbc:mysql://123.56.62.146:3306/gbuyer
+    driver-class-name: com.mysql.jdbc.Driver
+  # jpa
+  jpa:
+    show-sql: true
+    format-sql: true
+    ddl-auto: update
