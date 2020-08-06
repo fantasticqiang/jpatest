@@ -16,6 +16,12 @@ public class MySpecification<T> implements Specification<T> {
         this.parameterCriteria = new ParameterCriteria(parameterCriteriaStr);
     }
 
+    /**
+     * 获取查询的字段名称
+     * @param root
+     * @param path
+     * @return
+     */
     private Expression get(Root<T> root, String path) {
         String[] paths = path.split("\\.");
         Path finalPath = root.get(paths[0]);
@@ -27,6 +33,13 @@ public class MySpecification<T> implements Specification<T> {
         return finalPath;
     }
 
+    /**
+     * 封装一个查询条件
+     * @param root
+     * @param criteriaQuery
+     * @param criteriaBuilder
+     * @return
+     */
     @Override
     public Predicate toPredicate(Root<T> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
         Expression expression = get(root, parameterCriteria.getKey());
@@ -34,33 +47,29 @@ public class MySpecification<T> implements Specification<T> {
 
         switch (parameterCriteria.getOperator()) {
             case greaterEqualThan:
-                return criteriaBuilder.greaterThanOrEqualTo(get(root, parameterCriteria.getKey()), parameterCriteria.getValue(javaType, criteriaBuilder));
+                return criteriaBuilder.greaterThanOrEqualTo(expression, parameterCriteria.getValue(javaType, criteriaBuilder));
             case greaterThan:
-                return criteriaBuilder.greaterThan(get(root, parameterCriteria.getKey()), parameterCriteria.getValue(javaType, criteriaBuilder));
+                return criteriaBuilder.greaterThan(expression, parameterCriteria.getValue(javaType, criteriaBuilder));
             case lessEqualThan:
-                return criteriaBuilder.lessThanOrEqualTo(get(root, parameterCriteria.getKey()), parameterCriteria.getValue(javaType, criteriaBuilder));
+                return criteriaBuilder.lessThanOrEqualTo(expression, parameterCriteria.getValue(javaType, criteriaBuilder));
             case lessThan:
-                return criteriaBuilder.lessThan(get(root, parameterCriteria.getKey()), parameterCriteria.getValue(javaType, criteriaBuilder));
+                return criteriaBuilder.lessThan(expression, parameterCriteria.getValue(javaType, criteriaBuilder));
             case equal:
-                return criteriaBuilder.equal(get(root, parameterCriteria.getKey()), parameterCriteria.getValue(javaType, criteriaBuilder));
+                return criteriaBuilder.equal(expression, parameterCriteria.getValue(javaType, criteriaBuilder));
             case notEqual:
-                return criteriaBuilder.notEqual(get(root, parameterCriteria.getKey()), parameterCriteria.getValue(javaType, criteriaBuilder));
+                return criteriaBuilder.notEqual(expression, parameterCriteria.getValue(javaType, criteriaBuilder));
             case in:
-                Expression expression1 = get(root, parameterCriteria.getKey());
-                expression1.in(parameterCriteria.getStringValue().split(Common.FILTER_SPECIFICATION_VALUE_SPLITTER));
-                return criteriaBuilder.in(expression1);
+                return expression.in(Arrays.asList(parameterCriteria.getStringValue().split(Common.FILTER_SPECIFICATION_VALUE_SPLITTER)));
             case notIn:
-                Expression expression2 = get(root, parameterCriteria.getKey());
-                expression2.in(parameterCriteria.getStringValue().split(Common.FILTER_SPECIFICATION_VALUE_SPLITTER));
-                return criteriaBuilder.not(expression2);
+                return criteriaBuilder.not(expression.in(Arrays.asList(parameterCriteria.getStringValue().split(Common.FILTER_SPECIFICATION_VALUE_SPLITTER))));
             case like:
-                return criteriaBuilder.like(get(root, parameterCriteria.getKey()),"%" + parameterCriteria.getStringValue() + "%");
+                return criteriaBuilder.like(expression,"%" + parameterCriteria.getStringValue() + "%");
             case unlike:
-                return criteriaBuilder.notLike(get(root, parameterCriteria.getKey()),"%" + parameterCriteria.getStringValue() + "%");
+                return criteriaBuilder.notLike(expression,"%" + parameterCriteria.getStringValue() + "%");
             case isnull:
-                return criteriaBuilder.isNull(get(root, parameterCriteria.getKey()));
+                return criteriaBuilder.isNull(expression);
             case notnull:
-                return criteriaBuilder.isNotNull(get(root, parameterCriteria.getKey()));
+                return criteriaBuilder.isNotNull(expression);
             case jspe:
                 String[] jspeParamValues = parameterCriteria.getStringValue().split(Common.FILTER_SPECIFICATION_VALUE_SPLITTER);
                 String jspePath = jspeParamValues[0], jspeValue = jspeParamValues[1];
@@ -87,6 +96,10 @@ public class MySpecification<T> implements Specification<T> {
     }
 
 
+    /**
+     * 一个标准查询查询参数，url中的查询条件解析成对象
+     * 比如：username=张三
+     */
     public static class ParameterCriteria {
         private String key;
         private EFieldOperator operator;

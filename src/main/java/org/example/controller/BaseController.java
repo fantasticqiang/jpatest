@@ -19,6 +19,8 @@ public abstract class BaseController<T extends EntityBase> {
         result.setItems(page.getContent());
         result.setTotal(page.getTotalElements());
         result.setTotalPage((long) page.getTotalPages());
+        result.setMsg("查询列表成功");
+        result.setCode("000");
         return result;
     }
 
@@ -30,6 +32,7 @@ public abstract class BaseController<T extends EntityBase> {
             r.setCode("100");
             r.setMsg("新增成功");
         } catch (Exception e) {
+            e.printStackTrace();
             r.setCode("101");
             r.setMsg("新增失败");
         }

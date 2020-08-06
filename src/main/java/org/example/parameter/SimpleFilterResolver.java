@@ -10,6 +10,10 @@ import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;
 
+/**
+ * 接收传过来的url参数，封装成specification查询条件
+ * @param <T>
+ */
 public class SimpleFilterResolver<T> {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -32,7 +36,7 @@ public class SimpleFilterResolver<T> {
         for (String orString : filterString.split(Common.FILTER_SPECIFICATION_OR_SPLITTER)) {
             String[] split = orString.split(Common.FILTER_SPECIFICATION_AND_SPLITTER);
             if (split.length >= 1) {
-                MySpecification<T> mySpec = null;
+                Specification<T> mySpec = null;
                 for (int i = 0; i < split.length; i++) {
                     if (mySpec == null) {
                         if (StringUtils.isNotBlank(split[i])) {
@@ -40,7 +44,7 @@ public class SimpleFilterResolver<T> {
                         }
                     } else {
                         if (StringUtils.isNotBlank(split[i])) {
-                            mySpec.and(new MySpecification<T>(split[i]));
+                            mySpec = mySpec.and(new MySpecification<T>(split[i]));
                         }
                     }
                 }
@@ -48,7 +52,7 @@ public class SimpleFilterResolver<T> {
                     if (orSpec == null) {
                         orSpec = mySpec;
                     } else {
-                        orSpec.or(mySpec);
+                        orSpec = orSpec.or(mySpec);
                     }
                 }
             }

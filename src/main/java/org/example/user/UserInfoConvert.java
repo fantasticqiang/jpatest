@@ -6,14 +6,14 @@ import org.example.conf.BaseConfiguration;
 import javax.persistence.AttributeConverter;
 import java.util.ArrayList;
 
-public class UserInfoConvert implements AttributeConverter<ArrayList<UserInfo>, String> {
+public class UserInfoConvert implements AttributeConverter<UserInfo, String> {
     @Override
-    public String convertToDatabaseColumn(ArrayList<UserInfo> attribute) {
+    public String convertToDatabaseColumn(UserInfo attribute) {
         return BaseConfiguration.generalGson().toJson(attribute);
     }
 
     @Override
-    public ArrayList<UserInfo> convertToEntityAttribute(String dbData) {
-        return BaseConfiguration.generalGson().fromJson(dbData, new TypeToken<ArrayList<UserInfo>>(){}.getType());
+    public UserInfo convertToEntityAttribute(String dbData) {
+        return BaseConfiguration.generalGson().fromJson(dbData, new TypeToken<UserInfo>(){}.getType());
     }
 }

@@ -2,10 +2,14 @@ spring:
   datasource:
     username: root
     password: root
-    url: jdbc:mysql://123.56.62.146:3306/gbuyer
+    url: jdbc:mysql://123.56.62.146:3306/gbuyer?Unicode=true&characterEncoding=utf8
     driver-class-name: com.mysql.jdbc.Driver
+    initialization-mode: always
   # jpa
   jpa:
     show-sql: true
-    format-sql: true
-    ddl-auto: update
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        format-sql: true
